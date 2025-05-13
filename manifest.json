@@ -1,0 +1,37 @@
+{
+  "manifest_version": 2,
+  "name": "CustomSpeed for Udemy",
+  "version": "1.0.0",
+  "description": "Decimal-precision video speed control on Udemy, with per-course memory.",
+  "permissions": ["storage", "tabs", "<all_urls>"],
+  "content_scripts": [
+    {
+      "matches": ["*://*.udemy.com/*"],
+      "js": ["content_script.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": true
+  },
+  "commands": {
+    "increase-speed": {
+      "suggested_key": { "default": "Alt+Up" },
+      "description": "Increase video speed"
+    },
+    "decrease-speed": {
+      "suggested_key": { "default": "Alt+Down" },
+      "description": "Decrease video speed"
+    }
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "customspeed@example.com"
+    }
+  },
+  "icons": {
+    "48": "icons/icon.svg",
+    "128": "icons/icon.svg"
+  }
+}

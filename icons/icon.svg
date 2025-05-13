@@ -1,0 +1,9 @@
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" stroke-linejoin="round" stroke-linecap="round" stroke-width="4" stroke="#F0F8FF" fill="transparent">
+ <g>
+  <title>Layer 1</title>
+  <circle id="svg_1" r="28" cy="32" cx="32"/>
+  <path id="svg_2" d="m32,32l0,-20"/>
+  <circle id="svg_3" fill="#F0F8FF" r="4" cy="32" cx="32"/>
+ </g>
+
+</svg>
