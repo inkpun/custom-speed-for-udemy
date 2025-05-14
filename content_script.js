@@ -26,7 +26,6 @@
     }
   }
 
-  // Initial load & apply
   await loadAndApply();
 
   // Re-run on SPA URL changes
@@ -58,7 +57,7 @@
   }
 
   function applyRate(r) {
-    console.debug("[CS] applyRate()", r, new Date().toLocaleTimeString());
+    console.debug("[CS] applyRate()", r);
 
     // 2.1 Video.js API
     if (window.videojs && videojs.getAllPlayers) {
@@ -95,11 +94,7 @@
   // 2.4 Debug native rate changes on <video>
   document.querySelectorAll("video").forEach((v) => {
     v.addEventListener("ratechange", () => {
-      console.debug(
-        "[CS] native ratechange to",
-        v.playbackRate,
-        new Date().toLocaleTimeString()
-      );
+      console.debug("[CS] native ratechange to", v.playbackRate);
     });
   });
 
@@ -107,13 +102,7 @@
   setInterval(() => {
     document.querySelectorAll("video").forEach((v) => {
       if (Math.abs(v.playbackRate - rate) > 0.001) {
-        console.debug(
-          "[CS] Poll override",
-          v.playbackRate,
-          "→",
-          rate,
-          new Date().toLocaleTimeString()
-        );
+        console.debug("[CS] Poll override", v.playbackRate, "→", rate);
         applyRate(rate);
       }
     });
@@ -156,7 +145,8 @@
       await saveRate();
     });
 
-    return li.append(label, input), li;
+    li.append(label, input);
+    return li;
   }
 
   function bindRateButton() {
@@ -169,12 +159,41 @@
         const ul = document.querySelector(
           'ul[data-purpose="playback-rate-menu"]'
         );
-        if (ul && !ul.querySelector(".cs-udemy-slider-item")) {
-          const sliderLi = makeSliderItem();
+        if (!ul) return;
+
+        // inject slider if missing
+        let sliderLi = ul.querySelector(".cs-udemy-slider-item");
+        if (!sliderLi) {
+          sliderLi = makeSliderItem();
           markCustomSlider(sliderLi);
           ul.insertBefore(sliderLi, ul.firstElementChild);
-          clearNativeSelections();
         }
+
+        // add native preset listener
+        ul.querySelectorAll('li[role="none"]').forEach((li) => {
+          if (li._csNative) return;
+          li._csNative = true;
+          li.addEventListener("click", async () => {
+            // parse Udemy's preset
+            const txt = li.textContent.trim().replace("×", "");
+            const chosen = parseFloat(txt);
+            if (isNaN(chosen)) return;
+
+            // apply and save
+            rate = chosen;
+            applyRate(rate);
+            await saveRate();
+
+            // update slider UI
+            const input = sliderLi.querySelector("input");
+            const label = sliderLi.querySelector("span");
+            input.value = rate.toFixed(2);
+            label.textContent = rate.toFixed(2) + "×";
+            markCustomSlider(sliderLi);
+          });
+        });
+
+        // done—slider keeps its last value across videos because we never override it here
       }, 100);
     });
   }
