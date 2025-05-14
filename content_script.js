@@ -40,18 +40,25 @@
 
   // ─────────────── 2. APPLY RATE & UI UTILS ───────────────
   function clearNativeSelections() {
-    document
-      .querySelectorAll(
-        'ul[data-purpose="playback-rate-menu"] li[role="menuitemradio"]'
-      )
-      .forEach((li) => {
-        li.setAttribute("aria-checked", "false");
-        li.classList.remove("vjs-selected");
-      });
+    const allNativeSelectionsButtons = document.querySelectorAll(
+      'ul[data-purpose="playback-rate-menu"] li[role="none"] button'
+    );
+
+    allNativeSelectionsButtons.forEach((button) => {
+      if (
+        parseFloat(button.querySelector("div span").textContent).toFixed(2) ==
+        rate
+      ) {
+        button.setAttribute("aria-checked", "true");
+      } else {
+        button.setAttribute("aria-checked", "false");
+        button.classList.remove("vjs-selected");
+      }
+    });
   }
 
   function markCustomSlider(li) {
-    li.setAttribute("role", "menuitemradio");
+    li.setAttribute("role", "menuitemslider");
     li.setAttribute("aria-checked", "true");
     li.classList.add("vjs-selected");
   }
