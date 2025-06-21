@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "CustomSpeed for Udemy",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Learn even smarter on Udemy by setting the pace that fits your time.",
   "permissions": ["storage", "tabs", "*://*.udemy.com/*"],
   "content_scripts": [
