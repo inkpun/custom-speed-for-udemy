@@ -1,9 +1,7 @@
 (async () => {
-  // ─────────────── 1. STORAGE & RATE HANDLING ───────────────
   let rate = 1.0;
   let courseId = location.pathname.split("/")[2] || "global";
 
-  // Load the saved rate and apply it
   async function loadAndApply() {
     try {
       const { defaults = {} } = await browser.storage.sync.get("defaults");
@@ -15,7 +13,6 @@
     applyRate(rate);
   }
 
-  // Save the current rate
   async function saveRate() {
     try {
       const { defaults = {} } = await browser.storage.sync.get("defaults");
@@ -28,7 +25,6 @@
 
   await loadAndApply();
 
-  // Re-run on SPA URL changes
   let lastPath = location.pathname;
   new MutationObserver(async () => {
     if (location.pathname !== lastPath) {
@@ -38,7 +34,6 @@
     }
   }).observe(document.body, { childList: true, subtree: true });
 
-  // ─────────────── 2. APPLY RATE & UI UTILS ───────────────
   function clearNativeSelections() {
     const allNativeSelectionsButtons = document.querySelectorAll(
       'ul[data-purpose="playback-rate-menu"] li[role="none"] button'
@@ -66,7 +61,6 @@
   function applyRate(r) {
     console.debug("[CS] applyRate()", r);
 
-    // 2.1 Video.js API
     if (window.videojs && videojs.getAllPlayers) {
       videojs.getAllPlayers().forEach((player) => {
         player.playbackRate(r);
@@ -78,7 +72,6 @@
       });
     }
 
-    // 2.2 Raw <video> fallback
     document.querySelectorAll("video").forEach((v) => {
       v.playbackRate = r;
       v.defaultPlaybackRate = r;
@@ -87,7 +80,6 @@
       v.addEventListener("loadedmetadata", v._csListener);
     });
 
-    // 2.3 Update Udemy UI and clear native options
     const rateBtn = document.querySelector(
       '[data-purpose="playback-rate-button"]'
     );
@@ -98,14 +90,12 @@
     clearNativeSelections();
   }
 
-  // 2.4 Debug native rate changes on <video>
   document.querySelectorAll("video").forEach((v) => {
     v.addEventListener("ratechange", () => {
       console.debug("[CS] native ratechange to", v.playbackRate);
     });
   });
 
-  // 2.5 Poll to catch missed resets
   setInterval(() => {
     document.querySelectorAll("video").forEach((v) => {
       if (Math.abs(v.playbackRate - rate) > 0.001) {
@@ -115,7 +105,6 @@
     });
   }, 500);
 
-  // ─────────────── 3. SLIDER INJECTION & BINDING ───────────────
   function makeSliderItem() {
     const li = document.createElement("li");
     li.className = "cs-udemy-slider-item";
@@ -168,7 +157,6 @@
         );
         if (!ul) return;
 
-        // inject slider if missing
         let sliderLi = ul.querySelector(".cs-udemy-slider-item");
         if (!sliderLi) {
           sliderLi = makeSliderItem();
@@ -176,22 +164,18 @@
           ul.insertBefore(sliderLi, ul.firstElementChild);
         }
 
-        // add native preset listener
         ul.querySelectorAll('li[role="none"]').forEach((li) => {
           if (li._csNative) return;
           li._csNative = true;
           li.addEventListener("click", async () => {
-            // parse Udemy's preset
             const txt = li.textContent.trim().replace("×", "");
             const chosen = parseFloat(txt);
             if (isNaN(chosen)) return;
 
-            // apply and save
             rate = chosen;
             applyRate(rate);
             await saveRate();
 
-            // update slider UI
             const input = sliderLi.querySelector("input");
             const label = sliderLi.querySelector("span");
             input.value = rate.toFixed(2);
@@ -199,8 +183,6 @@
             markCustomSlider(sliderLi);
           });
         });
-
-        // done—slider keeps its last value across videos because we never override it here
       }, 100);
     });
   }
@@ -211,7 +193,6 @@
     subtree: true,
   });
 
-  // ─────────────── 4. HOTKEY SUPPORT ───────────────
   browser.runtime.onMessage.addListener(async (msg) => {
     if (msg.action === "adjust") {
       rate = Math.max(
