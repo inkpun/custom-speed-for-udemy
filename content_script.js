@@ -7,7 +7,6 @@
       const { defaults = {} } = await browser.storage.sync.get("defaults");
       rate = parseFloat(defaults[courseId] || 1.0);
     } catch (err) {
-      console.error("[CS] Error reading storage.sync:", err);
       rate = 1.0;
     }
     applyRate(rate);
@@ -18,9 +17,7 @@
       const { defaults = {} } = await browser.storage.sync.get("defaults");
       defaults[courseId] = rate;
       await browser.storage.sync.set({ defaults });
-    } catch (err) {
-      console.error("[CS] Error writing storage.sync:", err);
-    }
+    } catch (err) {}
   }
 
   await loadAndApply();
@@ -59,8 +56,6 @@
   }
 
   function applyRate(r) {
-    console.debug("[CS] applyRate()", r);
-
     if (window.videojs && videojs.getAllPlayers) {
       videojs.getAllPlayers().forEach((player) => {
         player.playbackRate(r);
@@ -90,16 +85,9 @@
     clearNativeSelections();
   }
 
-  document.querySelectorAll("video").forEach((v) => {
-    v.addEventListener("ratechange", () => {
-      console.debug("[CS] native ratechange to", v.playbackRate);
-    });
-  });
-
   setInterval(() => {
     document.querySelectorAll("video").forEach((v) => {
       if (Math.abs(v.playbackRate - rate) > 0.001) {
-        console.debug("[CS] Poll override", v.playbackRate, "→", rate);
         applyRate(rate);
       }
     });
