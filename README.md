@@ -12,7 +12,7 @@ Struggling with slow videos? Easily control Udemy speed to reduce wasted time an
 
 ## Installation
 
-1. Download the extension from [AMO](#) or load it as a temporary add-on in Firefox.
+1. Download the extension from [AMO](https://addons.mozilla.org/en-US/firefox/addon/customspeed-for-udemy/).
 2. Open any Udemy course video.
 3. Click the speed menu to use the slider, or use `Alt+Up`/`Down` to adjust speed.
 
